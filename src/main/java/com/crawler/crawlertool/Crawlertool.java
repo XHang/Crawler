@@ -10,9 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.crawler.Model.DownloadPicureConf;
+import com.crawler.util.Htmlutil;
+import com.crawler.util.HttpClientUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -141,5 +145,17 @@ public class Crawlertool {
 		Matcher p=reg.matcher(url);
 		p.find();
 		return p.group();
+    }
+
+    public static void  downloadPicure(DownloadPicureConf conf){
+       String context =   HttpClientUtil.getWebContent(conf.getSrcUrl());
+       List<String> picUrls =  Htmlutil.GetPicUrl(context);
+        for (String picUrl : picUrls) {
+            if (conf.getRule()!=null && !conf.getRule().urlFilter(picUrl)){
+                continue;
+            }
+            HttpClientUtil.downloadpath(picUrl,conf.getSavePatch());
+        }
+       return ;
     }
 }
